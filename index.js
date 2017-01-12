@@ -11,5 +11,8 @@ export default {
   },
   pop: function() {
   	console.log('HUSTLE')
+  },
+  sexy: function() {
+  	console.log('GOT EVENT FROM LIBMUSE --- SHIT SON')
   }
 };

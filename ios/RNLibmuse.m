@@ -4,6 +4,8 @@
 #import <React/RCTEventDispatcher.h>
 
 @implementation RNLibmuse
+@synthesize bridge = _bridge;
+
 
 - (dispatch_queue_t)methodQueue
 {
@@ -47,6 +49,19 @@ RCT_EXPORT_METHOD(museListChanged)
 {
   RCTLogInfo(@"shit changed");
 
+      [self.bridge.eventDispatcher sendAppEventWithName:@"sexy" body:nil];
+
+
+  // [self emitMessageToRN: @"sexy": nil];
+
+}
+
+
+- (void) emitMessageToRN: (NSString *)eventName
+                        :(NSDictionary *)params{
+  // RCTLogInfo(@"EMIT");
+  // [self.bridge.eventDispatcher sendAppEventWithName: eventName
+  //                                              body: params];
 }
 
 @end
