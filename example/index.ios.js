@@ -9,7 +9,8 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  NativeAppEventEmitter
 } from 'react-native';
 
 import Libmuse from 'react-native-libmuse'
@@ -19,7 +20,11 @@ export default class example extends Component {
 
     console.log("HELLO")
     console.log(Libmuse.startScan())
-    
+
+    NativeAppEventEmitter.addListener(
+    'sexy', 
+    () => console.log('Got event from RN'));
+
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
