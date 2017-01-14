@@ -4,15 +4,8 @@ import { NativeModules } from 'react-native';
 const { RNLibmuse } = NativeModules;
 
 export default {
-  startScan: function () {
-  	console.log('WTF');
-  	console.log(RNLibmuse);
-	RNLibmuse.startScan();
+  start: function () {
+	RNLibmuse.start();
   },
-  pop: function() {
-  	console.log('HUSTLE')
-  },
-  sexy: function() {
-  	console.log('GOT EVENT FROM LIBMUSE --- SHIT SON')
-  }
+  MUSES_AVAILABLE: RNLibmuse.MUSES_AVAILABLE
 };

@@ -6,6 +6,9 @@
 @implementation RNLibmuse
 @synthesize bridge = _bridge;
 
+static NSString *const MUSES_AVAILABLE = @"LIBMUSE:MusesAvailable";
+
+
 
 - (dispatch_queue_t)methodQueue
 {
@@ -13,9 +16,9 @@
 }
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(startScan)
+RCT_EXPORT_METHOD(start)
 {
-  RCTLogInfo(@"start scanning chromecast!");
+  RCTLogInfo(@"init Libmuse!");
 
     dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -26,35 +29,42 @@ RCT_EXPORT_METHOD(startScan)
 	    [self.manager setMuseListener:self];
         
         [self.muse registerConnectionListener:self];
+
+    	[self.muse registerDataListener:self
+                               type:IXNMuseDataPacketTypeArtifacts];
+    	[self.muse registerDataListener:self
+                               type:IXNMuseDataPacketTypeAlphaAbsolute];
+
         [self.muse runAsynchronously];
         [self.manager startListening];
 	    
-//	    [self connect];
        RCTLogInfo(@"I FUCKING DID IT");
     });
-  // Initialize device scanner.
-    // GCKFilterCriteria *filterCriteria =
-    // [GCKFilterCriteria 
-    //      criteriaForAvailableApplicationWithID:    kGCKMediaDefaultReceiverApplicationID];
-    // self.deviceScanner = 
-    //    [[GCKDeviceScanner alloc]     
-    //       initWithFilterCriteria:filterCriteria];
-    // [self.deviceScanner addListener:self];
-    // [self.deviceScanner startScan];
-    // [self.deviceScanner setPassiveScan:YES];
 }
 
-RCT_EXPORT_METHOD(museListChanged)
+- (void) museListChanged {
+  	RCTLogInfo(@"LIBMUSE list changed");
 
-{
-  RCTLogInfo(@"shit changed");
-
-      [self.bridge.eventDispatcher sendAppEventWithName:@"sexy" body:nil];
-
-
-  // [self emitMessageToRN: @"sexy": nil];
-
+  	NSArray * muses = [self.manager getMuses];
+    [self.bridge.eventDispatcher sendAppEventWithName:MUSES_AVAILABLE body:muses];
 }
+
+- (void)receiveMuseConnectionPacket:(IXNMuseConnectionPacket *)packet muse:(IXNMuse *)muse {
+	RCTLogInfo(@"LIBMUSE connection Packet");
+}
+
+-(void)receiveLog:(IXNLogPacket *)log {
+    RCTLogInfo(@"LIBMUSE log packet");
+}
+
+-(void)receiveMuseDataPacket:(IXNMuseDataPacket *)packet muse:(IXNMuse *)muse {
+    RCTLogInfo(@"LIBMUSE data packet");
+}
+
+-(void)receiveMuseArtifactPacket:(IXNMuseArtifactPacket *)packet muse:(IXNMuse *)muse {
+    RCTLogInfo(@"LIBMUSE artifact packet");
+}
+
 
 
 - (void) emitMessageToRN: (NSString *)eventName

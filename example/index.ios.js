@@ -15,15 +15,28 @@ import {
 
 import Libmuse from 'react-native-libmuse'
 
+var num = 0;
+
 export default class example extends Component {
   render() {
 
-    console.log("HELLO")
-    console.log(Libmuse.startScan())
+    console.log("MOFER")
+    console.log(Libmuse.start())
 
     NativeAppEventEmitter.addListener(
-    'sexy', 
-    () => console.log('Got event from RN'));
+    'LIBMUSE:MusesAvailable', 
+    (muses) => console.log('Got event from RN', muses));
+
+    NativeAppEventEmitter.addListener(
+    'DATA', 
+    (data) => {
+      q
+      num += 1
+
+      if (num >= 1000) {
+        console.log('1000')
+      }
+    });
 
     return (
       <View style={styles.container}>
