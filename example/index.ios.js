@@ -21,21 +21,28 @@ export default class example extends Component {
   render() {
 
     console.log("MOFER")
-    console.log(Libmuse.start())
+    Libmuse.start()
 
     NativeAppEventEmitter.addListener(
     'LIBMUSE:MusesAvailable', 
-    (muses) => console.log('Got event from RN', muses));
+    (muses) => {
+      console.log('Got event from RN', muses)
+      Libmuse.connectToMuse();
+    });
 
     NativeAppEventEmitter.addListener(
     'DATA', 
     (data) => {
-      q
-      num += 1
+      var sum = data.reduce(function(a, b) {
+        return a + b;
+      });
+      var avg = sum / data.length
+      console.log(avg)
+      // num += 1
 
-      if (num >= 1000) {
-        console.log('1000')
-      }
+      // if (num >= 1000) {
+      //   console.log('1000')
+      // }
     });
 
     return (

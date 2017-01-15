@@ -22,47 +22,90 @@ RCT_EXPORT_METHOD(start)
 
     dispatch_async(dispatch_get_main_queue(), ^{
 
-	   	if (!self.manager) {
-	        self.manager = [IXNMuseManagerIos sharedManager];
-	    }
-	    
-	    [self.manager setMuseListener:self];
+      if (!self.manager) {
+          self.manager = [IXNMuseManagerIos sharedManager];
+      }
+      
+      [self.manager setMuseListener:self];
         
-        [self.muse registerConnectionListener:self];
-
-    	[self.muse registerDataListener:self
-                               type:IXNMuseDataPacketTypeArtifacts];
-    	[self.muse registerDataListener:self
-                               type:IXNMuseDataPacketTypeAlphaAbsolute];
-
-        [self.muse runAsynchronously];
+//        [self.muse registerConnectionListener:self];
+//
+//      [self.muse registerDataListener:self
+//                               type:IXNMuseDataPacketTypeArtifacts];
+//      [self.muse registerDataListener:self
+//                               type:IXNMuseDataPacketTypeAlphaAbsolute];
+//
+//        [self.muse runAsynchronously];
         [self.manager startListening];
-	    
+      
        RCTLogInfo(@"I FUCKING DID IT");
     });
 }
 
 - (void) museListChanged {
-  	RCTLogInfo(@"LIBMUSE list changed");
+    RCTLogInfo(@"LIBMUSE list changed");
+    
+    NSMutableArray *array = [[NSMutableArray alloc]initWithCapacity: [muses count]];
+    
+    for (int i = 0; i < [muses count]; i++) {
+        IXNMuse * m = [[self.manager getMuses] objectAtIndex:i];
+        NSString *name = [m getName];
+        NSString *mac = [m getMacAddress];
+        
+    
+        NSDictionary *museDict = @{
+           @"name": name,
+           @"mac_address": mac,
+        };
+        
+        [array addObject:museDict];
+    }
+    
 
-  	NSArray * muses = [self.manager getMuses];
-    [self.bridge.eventDispatcher sendAppEventWithName:MUSES_AVAILABLE body:muses];
+    NSLog(@"%@", array);
+    
+    [self.bridge.eventDispatcher sendAppEventWithName:MUSES_AVAILABLE body:array];
+}
+
+RCT_EXPORT_METHOD(connectToMuse) {
+    NSArray * muses = [self.manager getMuses];
+        
+    NSLog(@"CONNECTING TO MUSE");
+    IXNMuse *muse = [muses firstObject];
+    self.muse = muse;
+    
+    [self connect];
+}
+
+- (void) connect {
+    [self.muse registerConnectionListener:self];
+    [self.muse registerDataListener:self
+                               type:IXNMuseDataPacketTypeArtifacts];
+    [self.muse registerDataListener:self
+                               type:IXNMuseDataPacketTypeAlphaAbsolute];
+    /*
+     [self.muse registerDataListener:self
+     type:IXNMuseDataPacketTypeEeg];
+     */
+    [self.muse runAsynchronously];
 }
 
 - (void)receiveMuseConnectionPacket:(IXNMuseConnectionPacket *)packet muse:(IXNMuse *)muse {
-	RCTLogInfo(@"LIBMUSE connection Packet");
+  RCTLogInfo(@"LIBMUSE connection Packet");
 }
 
 -(void)receiveLog:(IXNLogPacket *)log {
-    RCTLogInfo(@"LIBMUSE log packet");
+//    RCTLogInfo(@"LIBMUSE log packet");
 }
 
 -(void)receiveMuseDataPacket:(IXNMuseDataPacket *)packet muse:(IXNMuse *)muse {
-    RCTLogInfo(@"LIBMUSE data packet");
+//    RCTLogInfo(@"LIBMUSE data packet");
+    
+    [self.bridge.eventDispatcher sendAppEventWithName:@"DATA" body:[packet values]];
 }
 
 -(void)receiveMuseArtifactPacket:(IXNMuseArtifactPacket *)packet muse:(IXNMuse *)muse {
-    RCTLogInfo(@"LIBMUSE artifact packet");
+//    RCTLogInfo(@"LIBMUSE artifact packet");
 }
 
 
